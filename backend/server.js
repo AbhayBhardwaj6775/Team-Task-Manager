@@ -6,12 +6,8 @@ const { sequelize } = require("./models");
 
 const app = express();
 
-// ✅ VERY IMPORTANT CORS FIX
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+// ✅ SIMPLE & SAFE CORS
+app.use(cors());
 
 app.use(express.json());
 
@@ -20,14 +16,16 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/projects", require("./routes/project"));
 app.use("/api/tasks", require("./routes/task"));
 
-// TEST ROUTE
+// ✅ TEST ROUTE (VERY IMPORTANT)
 app.get("/", (req, res) => {
-  res.send("API is running...");
+  res.send("API WORKING");
 });
 
 // START SERVER
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
 sequelize.sync().then(() => {
-  app.listen(PORT, () => console.log("Server running on port", PORT));
+  app.listen(PORT, () => {
+    console.log("Server running on port", PORT);
+  });
 });
