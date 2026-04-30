@@ -6,16 +6,14 @@ const { sequelize } = require("./models");
 
 const app = express();
 
-// ✅ FINAL CORS CONFIG (WORKS LOCAL + DEPLOY)
+// ✅ VERY IMPORTANT: allow ALL origins (debug mode)
 app.use(cors({
-  origin: [
-    "http://localhost:3000",                 // local frontend
-    "https://team-task-manager.vercel.app"   // <-- change if your frontend deployed URL is different
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  origin: true,
   credentials: true
 }));
+
+// ✅ Handle preflight requests
+app.options("*", cors());
 
 app.use(express.json());
 
@@ -29,9 +27,9 @@ app.get("/", (req, res) => {
   res.send("API WORKING");
 });
 
-// START SERVER
 const PORT = process.env.PORT || 8080;
 
+// START SERVER
 (async () => {
   try {
     await sequelize.authenticate();
@@ -41,7 +39,7 @@ const PORT = process.env.PORT || 8080;
       console.log(`🚀 Server running on ${PORT}`);
     });
   } catch (err) {
-    console.error("❌ DB ERROR:", err);
+    console.error("❌ ERROR:", err);
     process.exit(1);
   }
 })();
