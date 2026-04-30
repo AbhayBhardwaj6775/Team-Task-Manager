@@ -6,7 +6,17 @@ const { sequelize } = require("./models");
 
 const app = express();
 
-app.use(cors());
+// ✅ FINAL CORS CONFIG (WORKS LOCAL + DEPLOY)
+app.use(cors({
+  origin: [
+    "http://localhost:3000",                 // local frontend
+    "https://team-task-manager.vercel.app"   // <-- change if your frontend deployed URL is different
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // ROUTES
@@ -14,14 +24,14 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/projects", require("./routes/project"));
 app.use("/api/tasks", require("./routes/task"));
 
-// HEALTH CHECK
+// TEST ROUTE
 app.get("/", (req, res) => {
   res.send("API WORKING");
 });
 
+// START SERVER
 const PORT = process.env.PORT || 8080;
 
-// ✅ IMPORTANT FIX
 (async () => {
   try {
     await sequelize.authenticate();
@@ -31,7 +41,7 @@ const PORT = process.env.PORT || 8080;
       console.log(`🚀 Server running on ${PORT}`);
     });
   } catch (err) {
-    console.error("❌ DB CONNECTION FAILED:", err);
+    console.error("❌ DB ERROR:", err);
     process.exit(1);
   }
 })();
