@@ -6,13 +6,12 @@ const { sequelize } = require("./models");
 
 const app = express();
 
-// ✅ VERY IMPORTANT: allow ALL origins (debug mode)
+// ✅ CORS (open for now)
 app.use(cors({
   origin: true,
   credentials: true
 }));
 
-// ✅ Handle preflight requests
 app.options("*", cors());
 
 app.use(express.json());
@@ -22,12 +21,19 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/projects", require("./routes/project"));
 app.use("/api/tasks", require("./routes/task"));
 
-// TEST ROUTE
+// ROOT TEST
 app.get("/", (req, res) => {
-  res.send("API WORKING");
+  res.send("API WORKING 🚀");
 });
 
-const PORT = process.env.PORT || 8080;
+// ✅ IMPORTANT FIX FOR RAILWAY
+const PORT = process.env.PORT;
+
+// 🚨 FAIL FAST if PORT missing
+if (!PORT) {
+  console.error("❌ PORT is missing!");
+  process.exit(1);
+}
 
 // START SERVER
 (async () => {
@@ -35,11 +41,11 @@ const PORT = process.env.PORT || 8080;
     await sequelize.authenticate();
     console.log("✅ Database connected");
 
-    app.listen(PORT, () => {
+    app.listen(PORT, "0.0.0.0", () => {
       console.log(`🚀 Server running on ${PORT}`);
     });
   } catch (err) {
-    console.error("❌ ERROR:", err);
+    console.error("❌ SERVER ERROR:", err);
     process.exit(1);
   }
 })();
